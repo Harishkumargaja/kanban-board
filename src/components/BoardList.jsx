@@ -9,6 +9,7 @@ function BoardList() {
   const boards = useStore((state) => state.boards);
   const fetchBoards = useStore((state) => state.fetchBoards);
   const addBoard = useStore((state) => state.addBoard);
+  const removeBoard = useStore(state => state.removeBoard);
   const setSelectedBoardId = useStore((state) => state.setSelectedBoardId);
   const [newBoardTitle, setNewBoardTitle] = React.useState(''); // Corrected line
   const [userId, setUserId] = React.useState(null);
@@ -40,14 +41,14 @@ function BoardList() {
       <h2>Boards</h2>
       <form onSubmit={handleAddBoard}>
         <input type="text" value={newBoardTitle} onChange={(e) => setNewBoardTitle(e.target.value)} />
-        <button type="submit">Add Board</button>
+        <button type="submit">+ Add Board</button>
       </form>
       <ul>
         {boards.map((board) => (
           <li key={board.id} onClick={() => setSelectedBoardId(board.id)}>
             <div>
             {board.title}
-            <button onClick={() => handleDeleteBoard(note.id)} className="text-red-500">
+            <button onClick={() => removeBoard(board.id)} className="text-red-500">
               <FaTrashAlt />
             </button>
             </div>

@@ -163,7 +163,7 @@ function KanbanBoard() {
                           placeholder="Add card title"
                           className="w-full p-2 border rounded-md"
                         />
-                        <button type="submit" onClick={() => setSelectedListId(list.id)} className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">Add Card</button>
+                        <button type="submit" onClick={() => setSelectedListId(list.id)} className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Card</button>
                       </form>
                     </div>
                   )}
@@ -179,7 +179,7 @@ function KanbanBoard() {
                     placeholder="Add list title"
                     className="w-full p-2 border rounded-md"
                   />
-                  <button type="submit" className="mt-2 bg-green-500 text-white p-2 rounded-md w-full">Add List</button>
+                  <button type="submit" className="mt-2 bg-green-500 text-white p-2 rounded-md w-full">+ Add List</button>
                 </form>
               </div>
             </div>
