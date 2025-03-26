@@ -14,6 +14,23 @@ const useStore = create((set, get) => ({
     set({ boards: data || [] });
   },
 
+  removeBoard: async (boardId, userId) => {
+    try {
+      console.log(`Attempting to delete board with ID: ${boardId}`);
+      const { error } = await supabase.from('boards').delete().eq('id', boardId);
+      if (error) {
+        console.error('Error deleting board:', error);
+        return; // Exit if there's an error
+      }
+      console.log(`Board with ID: ${boardId} deleted successfully.`);
+      get().fetchBoards(userId);
+      set({ selectedBoardId: null });
+    } catch (err) {
+      console.error('An unexpected error occurred:', err);
+    }
+  },
+
+
   fetchLists: async (boardId) => {
     const { data, error } = await supabase.from('lists').select('*').eq('board_id', boardId).order('position');
     if (error) console.error('Error fetching lists:', error);
@@ -58,9 +75,24 @@ const useStore = create((set, get) => ({
     if(error) console.error('Error updating list position:', error);
     get().fetchLists(get().selectedBoardId);
   },
+
+  removeCard: async (cardId) => {
+    const { error } = await supabase.from('cards').delete().eq('id', cardId);
+    if (error) console.error('Error deleting card:', error);
+    get().fetchCards(get().lists.map((list) => list.id));
+  },
+
+  removeList: async (listId) => {
+    const { error } = await supabase.from('lists').delete().eq('id', listId);
+    if (error) console.error('Error deleting list:', error);
+    get().fetchLists(get().selectedBoardId);
+  },
+
   setSelectedBoardId: (boardId) => {
     set({ selectedBoardId: boardId });
   },
 }));
+
+
 
 export default useStore;

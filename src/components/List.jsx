@@ -5,7 +5,7 @@ import Card from './Card';
 
 function List({ list, cards }) {
   return (
-    <div className="min-w-[300px] bg-gray-100 rounded-md p-4 shadow-md">
+    <div className="min-w-[300px] bg-pink-400 rounded-md p-4 shadow-md">
       <h3 className="font-semibold mb-2">{list.title}</h3>
       <Droppable droppableId={list.id} type="card">
         {(provided) => (

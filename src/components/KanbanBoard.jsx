@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import useStore from '../store';
-import { v4 as uuidv4 } from 'uuid';
-import { FaPlus, FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt } from 'react-icons/fa';
+import { supabase } from '../supabaseClient';
 
 function KanbanBoard() {
   const selectedBoardId = useStore((state) => state.selectedBoardId);
@@ -15,6 +15,11 @@ function KanbanBoard() {
   const addCard = useStore((state) => state.addCard);
   const updateCardPosition = useStore((state) => state.updateCardPosition);
   const updateListPosition = useStore((state) => state.updateListPosition);
+  const removeCard = useStore((state) => state.removeCard);
+  const removeList = useStore((state) => state.removeList);
+  const removeBoard = useStore(state => state.removeBoard);
+  const [userId, setUserId] = useState(null);
+
 
   const [newListTitle, setNewListTitle] = useState('');
   const [newCardTitle, setNewCardTitle] = useState('');
@@ -70,6 +75,30 @@ function KanbanBoard() {
     }
   };
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user.id);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user.id);
+    });
+  }, []);
+
+  const handleDeleteBoard = async () => {
+    try {
+      if (!userId) {
+        console.error('User ID not available.');
+        return;
+      }
+      console.log(`Attempting to delete board with ID: ${selectedBoardId} for user: ${userId}`);
+      await removeBoard(selectedBoardId, userId);
+      console.log('Board deletion initiated.');
+    } catch (err) {
+      console.error('Error deleting board:', err);
+    }
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex overflow-x-auto p-4">
@@ -89,7 +118,13 @@ function KanbanBoard() {
                       {...provided.dragHandleProps}
                       className="min-w-[300px] bg-gray-100 rounded-md p-4 shadow-md"
                     >
-                      <h3 className="font-semibold mb-2">{list.title}</h3>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold mb-2">{list.title}</h3>
+                        <button onClick={() => removeList(list.id)} className="text-red-500">
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+
                       <Droppable droppableId={list.id} type="card">
                         {(provided) => (
                           <div
@@ -106,9 +141,12 @@ function KanbanBoard() {
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className="bg-white p-2 rounded-md shadow-sm mb-2"
+                                      className="bg-white p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow flex justify-between items-center"
                                     >
                                       {card.title}
+                                      <button onClick={() => removeCard(card.id)} className="text-red-500">
+                                        <FaTrashAlt />
+                                      </button>
                                     </div>
                                   )}
                                 </Draggable>
@@ -117,7 +155,7 @@ function KanbanBoard() {
                           </div>
                         )}
                       </Droppable>
-                      <form onSubmit={handleAddCard} className="mt-2" >
+                      <form onSubmit={handleAddCard} className="mt-2">
                         <input
                           type="text"
                           value={newCardTitle}
@@ -133,7 +171,7 @@ function KanbanBoard() {
               ))}
               {provided.placeholder}
               <div className="min-w-[300px]">
-                <form onSubmit={handleAddList} className="p-4" >
+                <form onSubmit={handleAddList} className="p-4">
                   <input
                     type="text"
                     value={newListTitle}
@@ -149,6 +187,7 @@ function KanbanBoard() {
         </Droppable>
       </div>
     </DragDropContext>
+  
   );
 }
 

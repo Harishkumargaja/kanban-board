@@ -2,6 +2,8 @@
 import React, { useEffect } from 'react';
 import useStore from '../store';
 import { supabase } from '../supabaseClient';
+import { FaEdit, FaTrashAlt, FaSave, FaTimes } from 'react-icons/fa';
+
 
 function BoardList() {
   const boards = useStore((state) => state.boards);
@@ -43,7 +45,12 @@ function BoardList() {
       <ul>
         {boards.map((board) => (
           <li key={board.id} onClick={() => setSelectedBoardId(board.id)}>
+            <div>
             {board.title}
+            <button onClick={() => handleDeleteBoard(note.id)} className="text-red-500">
+              <FaTrashAlt />
+            </button>
+            </div>
           </li>
         ))}
       </ul>
