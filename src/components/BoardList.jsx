@@ -37,24 +37,27 @@ function BoardList() {
   };
 
   return (
-    <div>
-      <h2>Boards</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-md shadow-md w-96">
+      <h2 className="text-2xl font-semibold mb-4 text-center">Boards</h2>
       <form onSubmit={handleAddBoard}>
-        <input type="text" value={newBoardTitle} onChange={(e) => setNewBoardTitle(e.target.value)} />
+        <input className="w-full p-2 mb-2 border rounded-md" type="text" value={newBoardTitle} onChange={(e) => setNewBoardTitle(e.target.value)} />
         <button type="submit">+ Add Board</button>
       </form>
       <ul>
         {boards.map((board) => (
           <li key={board.id} onClick={() => setSelectedBoardId(board.id)}>
             <div>
-            {board.title}
+            <p>{board.title}
             <button onClick={() => removeBoard(board.id)} className="text-red-500">
               <FaTrashAlt />
             </button>
+            </p>
             </div>
           </li>
         ))}
       </ul>
+    </div>
     </div>
   );
 }
