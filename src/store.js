@@ -88,8 +88,8 @@ const useStore = create((set, get) => ({
     get().fetchLists(get().selectedBoardId);
   },
 
-  setSelectedBoardId: (boardId) => {
-    set({ selectedBoardId: boardId });
+  setSelectedBoardId: (boardId,boardTitle) => {
+    set({ selectedBoardId: boardId,selectedBoardTitle:boardTitle });
   },
 }));
 

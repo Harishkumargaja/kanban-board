@@ -177,7 +177,7 @@ function KanbanBoard() {
                     value={newListTitle}
                     onChange={(e) => setNewListTitle(e.target.value)}
                     placeholder="Add list title"
-                    className="w-full p-2 border rounded-md"
+                    className="bg-amber-100 w-full p-2 border rounded-md"
                   />
                   <button type="submit" className="mt-2 bg-green-500 text-white p-2 rounded-md w-full">+ Add List</button>
                 </form>

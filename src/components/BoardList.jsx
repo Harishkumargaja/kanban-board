@@ -41,18 +41,16 @@ function BoardList() {
       <div className="bg-gray-500 p-8 rounded-md shadow-md w-96">
       <h2 className="text-2xl font-semibold mb-4 text-center">Boards</h2>
       <form onSubmit={handleAddBoard}>
-        <input className="w-full p-2 mb-2 border rounded-md" type="text" value={newBoardTitle} onChange={(e) => setNewBoardTitle(e.target.value)} />
+        <input className="bg-amber-100 w-full p-2 mb-2 border rounded-md" type="text" value={newBoardTitle} onChange={(e) => setNewBoardTitle(e.target.value)} />
         <button type="submit">+ Add Board</button>
       </form>
       <ul>
         {boards.map((board) => (
-          <li key={board.id} onClick={() => setSelectedBoardId(board.id)}>
-            <div>
-            <p>{board.title}
+          <li key={board.id} onClick={() => setSelectedBoardId(board.id,board.title)}>
+            <div className="bg-yellow-300 p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow flex justify-between items-center">{board.title}
             <button onClick={() => removeBoard(board.id)} className="text-red-500">
               <FaTrashAlt />
             </button>
-            </p>
             </div>
           </li>
         ))}

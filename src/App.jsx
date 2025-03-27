@@ -12,6 +12,8 @@ function App() {
   const [session, setSession] = useState(null);
   const navigate = useNavigate();
   const selectedBoardId = useStore((state) => state.selectedBoardId);
+  const selectedBoardTitle = useStore((state) => state.selectedBoardTitle);
+  
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -37,6 +39,7 @@ function App() {
     <div className="h-screen">
       <h1 className="text-2xl font-semibold text-center p-4 bg-gray-800 text-white">Harish's Kanban Board</h1>
       <h2 className="text-xl font-semibold text-center p-4 bg-gray-200">Welcome, {session.user.email}</h2>
+      {selectedBoardId ? <div className="text-green-950 font-bold text-center p-4 text-3xl">{selectedBoardTitle}</div> : null}
       <button onClick={() => supabase.auth.signOut()} className="bg-red-500 text-white p-2 rounded-md flex right-2 top-2 absolute">Logout</button>
       <Routes>
         <Route path="/" element={selectedBoardId ? <KanbanBoard /> : <BoardList />} />

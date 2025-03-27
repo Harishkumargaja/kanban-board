@@ -43,14 +43,14 @@ function LoginPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 mb-2 border rounded-md"
+            className="bg-amber-100 w-full p-2 mb-2 border rounded-md"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 mb-4 border rounded-md"
+            className="bg-amber-100 w-full p-2 mb-4 border rounded-md"
           />
           <button
             type="submit"
