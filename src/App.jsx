@@ -35,7 +35,9 @@ function App() {
 
   return (
     <div className="h-screen">
-      <button onClick={() => supabase.auth.signOut()} className="bg-red-500 text-white p-2 rounded-md">Logout</button>
+      <h1 className="text-2xl font-semibold text-center p-4 bg-gray-800 text-white">Harish's Kanban Board</h1>
+      <h2 className="text-xl font-semibold text-center p-4 bg-gray-200">Welcome, {session.user.email}</h2>
+      <button onClick={() => supabase.auth.signOut()} className="bg-red-500 text-white p-2 rounded-md flex right-2 top-2 absolute">Logout</button>
       <Routes>
         <Route path="/" element={selectedBoardId ? <KanbanBoard /> : <BoardList />} />
         <Route path="/login" element={<LoginPage />} />

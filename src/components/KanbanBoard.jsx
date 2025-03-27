@@ -116,7 +116,7 @@ function KanbanBoard() {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="min-w-[300px] bg-gray-100 rounded-md p-4 shadow-md"
+                      className="min-w-[300px] bg-gray-600 rounded-md p-4 shadow-md"
                     >
                       <div className="flex justify-between items-center">
                         <h3 className="font-semibold mb-2">{list.title}</h3>
@@ -141,7 +141,7 @@ function KanbanBoard() {
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className="bg-white p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow flex justify-between items-center"
+                                      className="bg-gray-500 p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow flex justify-between items-center"
                                     >
                                       {card.title}
                                       <button onClick={() => removeCard(card.id)} className="text-red-500">
@@ -161,7 +161,7 @@ function KanbanBoard() {
                           value={newCardTitle}
                           onChange={(e) => setNewCardTitle(e.target.value)}
                           placeholder="Add card title"
-                          className="w-full p-2 border rounded-md"
+                          className="w-full p-2 border rounded-md bg-amber-100"
                         />
                         <button type="submit" onClick={() => setSelectedListId(list.id)} className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Card</button>
                       </form>
