@@ -39,6 +39,10 @@ function BoardList() {
     setNewBoardTitle('');
   };
 
+  const handleDelete = (boardId) => {
+    removeBoard(boardId);
+  };
+
   const handleEdit = (boardId, title) => {
     setEditingBoardId(boardId);
     setEditedTitle(title);
