@@ -33,8 +33,8 @@ function SignupPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-md shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4 text-center">Signup</h2>
+      <div className="bg-gray-500 p-8 rounded-md shadow-md w-96">
+        <h2 className="text-2xl text-black font-semibold mb-4 text-center">Signup</h2>
         {error && <p className="text-red-500 mb-2">{error}</p>}
         <form onSubmit={handleSignup}>
           <input
@@ -42,14 +42,14 @@ function SignupPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 mb-2 border rounded-md"
+            className="bg-yellow-300 w-full p-2 mb-2 border rounded-md"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 mb-4 border rounded-md"
+            className="bg-yellow-300 w-full p-2 mb-4 border rounded-md"
           />
           <button
             type="submit"

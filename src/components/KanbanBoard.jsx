@@ -134,7 +134,7 @@ function KanbanBoard() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col overflow-x-auto p-4">
+      <div className="text-black flex flex-col overflow-x-auto p-4">
         <div className="flex overflow-x-auto">
           <Droppable droppableId="all-lists" direction="horizontal" type="list">
             {(provided) => (
@@ -159,7 +159,7 @@ function KanbanBoard() {
                                 type="text"
                                 value={editedListTitle}
                                 onChange={(e) => setEditedListTitle(e.target.value)}
-                                className="bg-yellow-300 w-full p-2 border rounded-md"
+                                className="bg-yellow-300 text-black w-full p-2 border rounded-md"
                               />
                               <button className="text-green-500 p-0 m-2" onClick={() => handleSaveListEdit(list.id)}>
                                 <FaSave />
@@ -185,7 +185,7 @@ function KanbanBoard() {
 
                         <Droppable droppableId={list.id} type="card">
                           {(provided) => (
-                            <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <div ref={provided.innerRef} {...provided.droppableProps}><br></br>
                               {cards
                                 .filter((card) => card.list_id === list.id)
                                 .sort((a, b) => a.position - b.position)
@@ -204,7 +204,7 @@ function KanbanBoard() {
                                               type="text"
                                               value={editedCardTitle}
                                               onChange={(e) => setEditedCardTitle(e.target.value)}
-                                              className="bg-yellow-300 w-full p-2 border rounded-md"
+                                              className="bg-yellow-300 text-black w-full p-2 border rounded-md"
                                             />
                                             <button className="text-green-500 p-0 m-2" onClick={() => handleSaveCardEdit(card.id)}>
                                               <FaSave />
@@ -243,7 +243,7 @@ function KanbanBoard() {
                             value={newCardTitle}
                             onChange={(e) => setNewCardTitle(e.target.value)}
                             placeholder="Add card title"
-                            className="bg-yellow-300 w-full p-2 border rounded-md"
+                            className="bg-yellow-300 text-black w-full p-2 border rounded-md"
                           />
                           <button type="submit" onClick={() => setSelectedListId(list.id)} className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">
                             Add Card
@@ -261,7 +261,7 @@ function KanbanBoard() {
                       value={newListTitle}
                       onChange={(e) => setNewListTitle(e.target.value)}
                       placeholder="Add list title"
-                      className="bg-yellow-300 w-full p-2 border rounded-md"
+                      className="bg-yellow-300 text-black w-full p-2 border rounded-md"
                     />
                     <button type="submit" className="mt-2 bg-green-500 text-white p-2 rounded-md w-full">
                       Add List
