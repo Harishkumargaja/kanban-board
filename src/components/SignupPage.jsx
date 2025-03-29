@@ -26,6 +26,7 @@ function SignupPage() {
       console.log(authError.message);
       setError(authError.message);
     } else {
+      alert('Check your email for the confirmation link to complete the signup process.');
       navigate('/'); // Redirect to the main app after signup
     }
   };

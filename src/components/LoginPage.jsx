@@ -54,11 +54,15 @@ function LoginPage() {
           />
           <button
             type="submit"
-            className={`w-full bg-blue-500 text-white p-2 rounded-md ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full mb-4 bg-blue-500 text-white p-4 rounded-md ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
+          <button
+            className={'w-full mb-4 text-white p-4 rounded-md'}
+            onClick={() => navigate('/signup')}
+          >Signup</button>
         </form>
       </div>
     </div>

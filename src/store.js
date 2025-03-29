@@ -14,6 +14,13 @@ const useStore = create((set, get) => ({
     set({ boards: data || [] });
   },
 
+  updateBoard: async (boardId, title, userId) => {
+    const { error } = await supabase.from('boards').update({ title }).eq('id', boardId);
+    if (error) console.error('Error updating board:', error);
+    get().fetchBoards(userId);
+  },
+
+
   removeBoard: async (boardId, userId) => {
     try {
       console.log(`Attempting to delete board with ID: ${boardId}`);
