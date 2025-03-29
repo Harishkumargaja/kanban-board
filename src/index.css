@@ -40,11 +40,11 @@ h1 {
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 3px 3px; 
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #03b8ff;
+  background-color: #1c282d;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -65,6 +65,6 @@ button:focus-visible {
     color: #0e1afb;
   }
   button {
-    background-color: #01ddff;
+    background-color: #3b3c3c34;
   }
 }

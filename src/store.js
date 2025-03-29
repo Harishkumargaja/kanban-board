@@ -95,6 +95,18 @@ const useStore = create((set, get) => ({
     get().fetchLists(get().selectedBoardId);
   },
 
+  updateList: async (listId, title, boardId) => {
+    const { error } = await supabase.from('lists').update({ title }).eq('id', listId);
+    if (error) console.error('Error updating list:', error);
+    get().fetchLists(boardId);
+  },
+
+  updateCard: async (cardId, title) => {
+    const { error } = await supabase.from('cards').update({ title }).eq('id', cardId);
+    if (error) console.error('Error updating card:', error);
+    get().fetchCards(get().lists.map((list) => list.id));
+  },
+
   setSelectedBoardId: (boardId,boardTitle) => {
     set({ selectedBoardId: boardId,selectedBoardTitle:boardTitle });
   },

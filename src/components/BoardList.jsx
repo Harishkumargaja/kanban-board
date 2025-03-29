@@ -64,7 +64,7 @@ function BoardList() {
       <h2 className="text-2xl font-semibold mb-4 text-center">Boards</h2>
       <form onSubmit={handleAddBoard}>
         <input className="bg-amber-100 w-full p-2 mb-2 border rounded-md" type="text" value={newBoardTitle} onChange={(e) => setNewBoardTitle(e.target.value)} />
-        <button className="p-2 mb-2 border rounded-md" type="submit">+ Add Board</button>
+        <button className="p-2 mb-2 border rounded-md text-white" type="submit">+ Add Board</button>
       </form>
       <ul>
         {boards.map((board) => (
