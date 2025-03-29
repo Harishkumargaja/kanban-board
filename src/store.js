@@ -7,6 +7,7 @@ const useStore = create((set, get) => ({
   lists: [],
   cards: [],
   selectedBoardId: null,
+  selectedCardDetails: null,
 
   fetchBoards: async (userId) => {
     const { data, error } = await supabase.from('boards').select('*').eq('user_id', userId);
@@ -19,7 +20,6 @@ const useStore = create((set, get) => ({
     if (error) console.error('Error updating board:', error);
     get().fetchBoards(userId);
   },
-
 
   removeBoard: async (boardId, userId) => {
     try {
@@ -36,7 +36,6 @@ const useStore = create((set, get) => ({
       console.error('An unexpected error occurred:', err);
     }
   },
-
 
   fetchLists: async (boardId) => {
     const { data, error } = await supabase.from('lists').select('*').eq('board_id', boardId).order('position');
@@ -110,8 +109,32 @@ const useStore = create((set, get) => ({
   setSelectedBoardId: (boardId,boardTitle) => {
     set({ selectedBoardId: boardId,selectedBoardTitle:boardTitle });
   },
+
+  fetchCardDetails: async (cardId) => {
+    const { data, error } = await supabase.from('cards').select('*').eq('id', cardId).single();
+    if (error) console.error('Error fetching card details:', error);
+    set({ selectedCardDetails: data });
+  },
+
+  updateCardDetails: async (cardId, description, attachments) => {
+    const { error } = await supabase.from('cards').update({ description, attachments }).eq('id', cardId);
+    if (error) console.error('Error updating card details:', error);
+    get().fetchCardDetails(cardId);
+    get().fetchCards(get().lists.map((list) => list.id));
+  },
+
+  addComment: async (cardId, userId, text) => {
+    const { error } = await supabase.from('comments').insert([{ card_id: cardId, user_id: userId, text }]);
+    if (error) console.error('Error adding comment:', error);
+    get().fetchCardDetails(cardId);
+  },
+
+  fetchComments: async (cardId) => {
+    const { data, error } = await supabase.from('comments').select('*').eq('card_id', cardId);
+    if (error) console.error('Error fetching comments:', error);
+    return data || [];
+  },
+  
 }));
-
-
 
 export default useStore;

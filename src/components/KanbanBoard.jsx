@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import useStore from '../store';
 import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes} from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
+import CardDetailsModal from './CardDetailsModal';
 
 function KanbanBoard() {
   const selectedBoardId = useStore((state) => state.selectedBoardId);
@@ -29,6 +30,8 @@ function KanbanBoard() {
   const [editedListTitle, setEditedListTitle] = useState('');
   const [editingCardId, setEditingCardId] = useState(null);
   const [editedCardTitle, setEditedCardTitle] = useState('');
+  const [selectedCardId, setSelectedCardId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (selectedBoardId) {
@@ -41,6 +44,16 @@ function KanbanBoard() {
       fetchCards(lists.map((list) => list.id));
     }
   }, [lists, fetchCards]);
+
+  const handleCardClick = (cardId) => {
+    setSelectedCardId(cardId);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedCardId(null);
+  };
 
   const handleAddList = (e) => {
     e.preventDefault();
@@ -196,6 +209,7 @@ function KanbanBoard() {
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
+                                        onClick={() => handleCardClick(card.id)}
                                         className="bg-white p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow relative group  flex justify-between"
                                       >
                                         {editingCardId === card.id ? (
@@ -272,10 +286,10 @@ function KanbanBoard() {
             )}
           </Droppable>
         </div>
+        {isModalOpen && <CardDetailsModal cardId={selectedCardId} onClose={handleModalClose} />}
       </div>
     </DragDropContext>
   );
 }
-
 
 export default KanbanBoard;
