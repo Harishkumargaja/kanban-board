@@ -1,7 +1,6 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import BoardList from './components/BoardList';
 import KanbanBoard from './components/KanbanBoard';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
@@ -11,9 +10,6 @@ import useStore from './store';
 function App() {
   const [session, setSession] = useState(null);
   const navigate = useNavigate();
-  const selectedBoardId = useStore((state) => state.selectedBoardId);
-  const selectedBoardTitle = useStore((state) => state.selectedBoardTitle);
-  
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -37,12 +33,13 @@ function App() {
 
   return (
     <div className="h-screen">
-      <h1 className="text-2xl font-semibold text-center p-4 bg-gray-800 text-white">Harish's Kanban Board</h1>
-      <h2 className="text-xl font-semibold text-center p-4 bg-gray-200">Welcome, {session.user.email}</h2>
-      {selectedBoardId ? <div className="text-green-950 font-bold text-center p-4 text-3xl">{selectedBoardTitle}</div> : null}
-      <button onClick={() => supabase.auth.signOut()} className="bg-red-500 text-white p-2 rounded-md flex right-2 top-2 absolute">Logout</button>
+      <div className="bg-green-800 text-white p-4 flow-root">
+      <h3 className="text-2xl font-semibold text-left float-left">Harish's Kanban Board</h3>
+      <h2 className="text-xl font-semibold float-right"> &nbsp;{session.user.email}</h2>
+      <input type="text" placeholder='Search' className="border p-2 bg-white text-black rounded-md float-right" />
+      </div>
       <Routes>
-        <Route path="/" element={selectedBoardId ? <KanbanBoard /> : <BoardList />} />
+        <Route path="/" element={<KanbanBoard />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>
