@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import useStore from '../store';
-import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes, FaStar,FaUser, FaShare } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
 import CardDetailsModal from './CardDetailsModal';
 
@@ -182,17 +182,8 @@ function KanbanBoard() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 min-w-64 bg-gray-100 p-4"> 
-        <h2>Boards</h2>
-        <form onSubmit={handleAddBoard} className="mb-4">
-          <input
-            type="text"
-            value={newBoardTitle}
-            onChange={(e) => setNewBoardTitle(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          />
-          <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Board</button>
-        </form>
+      <div className="w-64 min-w-64 bg-gray-100 p-8"> 
+        <h2 className='text-3xl font-bold'>Boards</h2>
         <ul>
           {boards.map((board) => (
             <li key={board.id} className="flex items-center justify-between mb-2">
@@ -204,29 +195,39 @@ function KanbanBoard() {
                     onChange={(e) => setEditedBoardTitle(e.target.value)}
                     className="w-full p-2 border rounded-md"
                   />
-                  <button onClick={() => handleSaveBoardEdit(board.id)}><FaSave /></button>
-                  <button onClick={handleCancelBoardEdit}><FaTimes /></button>
+                  <button className='text-green-500 ml-4' onClick={() => handleSaveBoardEdit(board.id)}><FaSave /></button>
+                  <button className='text-red-500 ' onClick={handleCancelBoardEdit}><FaTimes /></button>
                 </>
               ) : (
                 <>
-                  <span onClick={() => setSelectedBoardId(board.id,board.title)} className="cursor-pointer">{board.title}</span>
+                  <span onClick={() => setSelectedBoardId(board.id,board.title)} className="cursor-pointer font-bold">{board.title}</span>
                   <div>
-                    <button onClick={() => handleEditBoard(board.id, board.title)}><FaEdit /></button>
-                    <button onClick={() => handleDeleteBoard(board.id)}><FaTrashAlt /></button>
+                    <button className='text-green-500 ml-4' onClick={() => handleEditBoard(board.id, board.title)}><FaEdit /></button>
+                    <button className='text-red-500' onClick={() => handleDeleteBoard(board.id)}><FaTrashAlt /></button>
                   </div>
                 </>
               )}
             </li>
           ))}
         </ul>
+        <form onSubmit={handleAddBoard} className="mb-4">
+          <input
+            type="text"
+            value={newBoardTitle}
+            onChange={(e) => setNewBoardTitle(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          />
+          <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Board</button>
+        </form>
       </div>
       <div className="flex-1 p-4">
         {selectedBoardId && (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col overflow-x-auto">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex bg-gray-500 p-5 justify-start m-4 items-left mb-4">
                 <h2 className="text-2xl font-bold">{selectedBoardId ? selectedBoardTitle : "select"} Board</h2>
-                <button onClick={() => supabase.auth.signOut()} className="bg-red-500 text-white p-2 rounded-md flex right-2 top-2">Logout</button>
+                <div className='text-xl pl-5'><FaStar /></div>
+                <div className='text-xl pl-5'><FaShare /></div>
               </div>
               <div className="flex overflow-x-auto">
                 <Droppable droppableId="all-lists" direction="horizontal" type="list">
@@ -243,7 +244,7 @@ function KanbanBoard() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="min-w-[300px] bg-gray-100 rounded-md p-4 shadow-md relative group"
+                              className="min-w-[300px] bg-gray-100 text-gray-600 rounded-md p-4 shadow-md relative group"
                             >
                               <div className="flex justify-between items-center">
                                 {editingListId === list.id ? (
@@ -254,22 +255,22 @@ function KanbanBoard() {
                                       onChange={(e) => setEditedListTitle(e.target.value)}
                                       className="w-full p-2 border rounded-md"
                                     />
-                                    <button onClick={() => handleSaveListEdit(list.id)}><FaSave /></button>
-                                    <button onClick={handleCancelListEdit}><FaTimes /></button>
+                                    <button className='text-green-500 ml-4' onClick={() => handleSaveListEdit(list.id)}><FaSave /></button>
+                                    <button className='text-red-500' onClick={handleCancelListEdit}><FaTimes /></button>
                                   </>
                                 ) : (
                                   <>
                                     <h3 className="font-semibold mb-2">{list.title}</h3>
                                     <div>
-                                      <button onClick={() => handleEditList(list.id, list.title)}><FaEdit /></button>
+                                      <button className='text-green-500 ml-4' onClick={() => handleEditList(list.id, list.title)}><FaEdit /></button>
                                       <button onClick={() => removeList(list.id)} className="text-red-500"><FaTrashAlt /></button>
                                     </div>
                                   </>
                                 )}
                               </div>
-                              <Droppable droppableId={list.id} type="card">
+                              <Droppable droppableId={list.id} type="card"> 
                                 {(provided) => (
-                                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                                  <div ref={provided.innerRef} {...provided.droppableProps}><br></br>
                                     {cards
                                       .filter((card) => card.list_id === list.id)
                                       .sort((a, b) => a.position - b.position)
@@ -291,14 +292,14 @@ function KanbanBoard() {
                                                     onChange={(e) => setEditedCardTitle(e.target.value)}
                                                     className="w-full p-2 border rounded-md"
                                                   />
-                                                  <button onClick={() => handleSaveCardEdit(card.id)}><FaSave /></button>
-                                                  <button onClick={handleCancelCardEdit}><FaTimes /></button>
+                                                  <button className='text-green-500 ml-4' onClick={() => handleSaveCardEdit(card.id)}><FaSave /></button>
+                                                  <button className='text-red-500' onClick={handleCancelCardEdit}><FaTimes /></button>
                                                 </>
                                               ) : (
                                                 <>
                                                   {card.title}
                                                   <div>
-                                                    <button onClick={() => handleEditCard(card.id, card.title)}><FaEdit /></button>
+                                                    <button className='text-green-500 ml-4' onClick={() => handleEditCard(card.id, card.title)}><FaEdit /></button>
                                                     <button onClick={() => removeCard(card.id)} className="text-red-500"><FaTimes /></button>
                                                   </div>
                                                 </>
