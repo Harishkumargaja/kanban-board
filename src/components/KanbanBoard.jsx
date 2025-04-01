@@ -182,11 +182,11 @@ function KanbanBoard() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 min-w-64 bg-gray-100 p-8"> 
-        <h2 className='text-3xl font-bold'>Boards</h2>
+      <div className="w-64 min-w-64 bg-gray-400 text-gray-800 p-8"> 
+        <h2 className='text-3xl font-bold mb-5'>Boards</h2>
         <ul>
           {boards.map((board) => (
-            <li key={board.id} className="flex items-center justify-between mb-2">
+            <li key={board.id} className="flex items-center justify-between mb-3">
               {editingBoardId === board.id ? (
                 <>
                   <input
@@ -195,14 +195,14 @@ function KanbanBoard() {
                     onChange={(e) => setEditedBoardTitle(e.target.value)}
                     className="w-full p-2 border rounded-md"
                   />
-                  <button className='text-green-500 ml-4' onClick={() => handleSaveBoardEdit(board.id)}><FaSave /></button>
+                  <button className='text-green-500 mr-2' onClick={() => handleSaveBoardEdit(board.id)}><FaSave /></button>
                   <button className='text-red-500 ' onClick={handleCancelBoardEdit}><FaTimes /></button>
                 </>
               ) : (
                 <>
                   <span onClick={() => setSelectedBoardId(board.id,board.title)} className="cursor-pointer font-bold">{board.title}</span>
                   <div>
-                    <button className='text-green-500 ml-4' onClick={() => handleEditBoard(board.id, board.title)}><FaEdit /></button>
+                    <button className='text-green-500 mr-2' onClick={() => handleEditBoard(board.id, board.title)}><FaEdit /></button>
                     <button className='text-red-500' onClick={() => handleDeleteBoard(board.id)}><FaTrashAlt /></button>
                   </div>
                 </>
@@ -220,13 +220,13 @@ function KanbanBoard() {
           <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Board</button>
         </form>
       </div>
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-2">
         {selectedBoardId && (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col overflow-x-auto">
-            <div className="flex bg-gray-500 p-5 justify-start m-4 items-left mb-4">
+            <div className="flex bg-gray-500 p-2 justify-start m-2 items-left">
                 <h2 className="text-2xl font-bold">{selectedBoardId ? selectedBoardTitle : "select"} Board</h2>
-                <div className='text-xl pl-5'><FaStar /></div>
+                <div className='text-xl pl-5 mr-5'><FaStar /></div>
                 <div className='text-xl pl-5'><FaShare /></div>
               </div>
               <div className="flex overflow-x-auto">
@@ -255,14 +255,14 @@ function KanbanBoard() {
                                       onChange={(e) => setEditedListTitle(e.target.value)}
                                       className="w-full p-2 border rounded-md"
                                     />
-                                    <button className='text-green-500 ml-4' onClick={() => handleSaveListEdit(list.id)}><FaSave /></button>
+                                    <button className='text-green-500 mr-2' onClick={() => handleSaveListEdit(list.id)}><FaSave /></button>
                                     <button className='text-red-500' onClick={handleCancelListEdit}><FaTimes /></button>
                                   </>
                                 ) : (
                                   <>
                                     <h3 className="font-semibold mb-2">{list.title}</h3>
                                     <div>
-                                      <button className='text-green-500 ml-4' onClick={() => handleEditList(list.id, list.title)}><FaEdit /></button>
+                                      <button className='text-green-500 mr-2' onClick={() => handleEditList(list.id, list.title)}><FaEdit /></button>
                                       <button onClick={() => removeList(list.id)} className="text-red-500"><FaTrashAlt /></button>
                                     </div>
                                   </>
@@ -282,7 +282,7 @@ function KanbanBoard() {
                                               {...provided.draggableProps}
                                               {...provided.dragHandleProps}
                                               onClick={() => handleCardClick(card.id)}
-                                              className="bg-white p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow relative group"
+                                              className="bg-gray-200 p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow flex flex-row"
                                             >
                                               {editingCardId === card.id ? (
                                                 <>
@@ -290,17 +290,17 @@ function KanbanBoard() {
                                                     type="text"
                                                     value={editedCardTitle}
                                                     onChange={(e) => setEditedCardTitle(e.target.value)}
-                                                    className="w-full p-2 border rounded-md"
+                                                    className="w-full p-2 border rounded-md flex-grow"
                                                   />
-                                                  <button className='text-green-500 ml-4' onClick={() => handleSaveCardEdit(card.id)}><FaSave /></button>
+                                                  <button className='text-green-500 mr-2' onClick={() => handleSaveCardEdit(card.id)}><FaSave /></button>
                                                   <button className='text-red-500' onClick={handleCancelCardEdit}><FaTimes /></button>
                                                 </>
                                               ) : (
                                                 <>
-                                                  {card.title}
+                                                  <div className='flex-grow'>{card.title}</div>
                                                   <div>
-                                                    <button className='text-green-500 ml-4' onClick={() => handleEditCard(card.id, card.title)}><FaEdit /></button>
-                                                    <button onClick={() => removeCard(card.id)} className="text-red-500"><FaTimes /></button>
+                                                    <button className='text-green-500 mr-2 flex-end' onClick={() => handleEditCard(card.id, card.title)}><FaEdit /></button>
+                                                    <button onClick={() => removeCard(card.id)} className="text-red-500 flex-end"><FaTrashAlt /></button>
                                                   </div>
                                                 </>
                                               )}
