@@ -220,11 +220,11 @@ function KanbanBoard() {
           <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Board</button>
         </form>
       </div>
-      <div className="flex-1 p-2">
+      <div className="flex-1">
         {selectedBoardId && (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col overflow-x-auto">
-            <div className="flex bg-gray-500 p-2 justify-start m-2 items-left">
+            <div className="flex bg-gray-500 p-2 justify-start items-left">
                 <h2 className="text-2xl font-bold">{selectedBoardId ? selectedBoardTitle : "select"} Board</h2>
                 <div className='text-xl pl-5 mr-5'><FaStar /></div>
                 <div className='text-xl pl-5'><FaShare /></div>
