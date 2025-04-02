@@ -166,14 +166,14 @@ function KanbanBoard() {
     setEditingBoardId(null);
   };
 
-  const handleDeleteBoard = async () => {
+  const handleDeleteBoard = async (boardId) => {
     try {
       if (!userId) {
         console.error('User ID not available.');
         return;
       }
-      console.log(`Attempting to delete board with ID: ${selectedBoardId} for user: ${userId}`);
-      await removeBoard(selectedBoardId, userId);
+      console.log(`Attempting to delete board with ID: ${boardId} for user: ${userId}`);
+      await removeBoard(boardId, userId);
       console.log('Board deletion initiated.');
     } catch (err) {
       console.error('Error deleting board:', err);
@@ -182,7 +182,7 @@ function KanbanBoard() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 min-w-64 bg-gray-400 text-gray-800 p-8"> 
+      <div className="w-64 min-w-64 bg-blue-600 text-gray-200 p-8"> 
         <h2 className='text-3xl font-bold mb-5'>Boards</h2>
         <ul>
           {boards.map((board) => (
@@ -220,11 +220,11 @@ function KanbanBoard() {
           <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded-md w-full">+ Add Board</button>
         </form>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 bg-blue-500">
         {selectedBoardId && (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col overflow-x-auto">
-            <div className="flex bg-gray-500 p-2 justify-start items-left">
+            <div className="flex bg-blue-200 p-2 justify-start items-left">
                 <h2 className="text-2xl font-bold">{selectedBoardId ? selectedBoardTitle : "select"} Board</h2>
                 <div className='text-xl pl-5 mr-5'><FaStar /></div>
                 <div className='text-xl pl-5'><FaShare /></div>
@@ -244,7 +244,7 @@ function KanbanBoard() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="min-w-[300px] bg-gray-100 text-gray-600 rounded-md p-4 shadow-md relative group"
+                              className="min-w-[300px] bg-gray-100 text-gray-600 rounded-md p-4 m-3 shadow-md relative group"
                             >
                               <div className="flex justify-between items-center">
                                 {editingListId === list.id ? (
@@ -327,7 +327,7 @@ function KanbanBoard() {
                         </Draggable>
                       ))}
                       {provided.placeholder}
-                      <div className="min-w-[300px]">
+                      <div className="min-w-[300px] bg-gray-100 text-gray-600 rounded-md p-4 m-3 shadow-md relative group">
                         <form onSubmit={handleAddList} className="p-4">
                           <input
                             type="text"

@@ -53,7 +53,7 @@ function App() {
 
   return (
     <div className="h-screen">
-      <div className="bg-green-800 text-white p-2 flex flex-row">
+      <div className="bg-blue-800 text-white p-2 flex flex-row">
       <h3 className="text-2xl font-semibold text-left flex-none align-middle">Harish's Kanban Board</h3>
       <div className='flex-grow'></div>
       <input type="text" placeholder='Search' className="border bg-white text-black rounded-md flex-end h-10" />
