@@ -56,7 +56,6 @@ function App() {
       <div className="bg-blue-800 text-white p-2 flex flex-row">
       <h3 className="text-2xl font-semibold text-left flex-none align-middle">Harish's Kanban Board</h3>
       <div className='flex-grow'></div>
-      <input type="text" placeholder='Search' className="border bg-white text-black rounded-md flex-end h-10" />
       <div onClick={() => handleToggle()} className="items-center flex-end text-2xl cursor-pointer m-2"><FaUser /></div>
       {isOpen && (
         <div ref={divRef} className='bg-gray-500 absolute text-2xl text-gray-800 right-2 top-16 z-10'>

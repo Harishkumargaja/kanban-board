@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import useStore from '../store';
-import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes, FaStar,FaUser, FaShare } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes, FaStar, FaUser, FaShare } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
 import CardDetailsModal from './CardDetailsModal';
 
@@ -41,6 +41,22 @@ function KanbanBoard() {
   const [editingBoardId, setEditingBoardId] = useState(null);
   const [editedBoardTitle, setEditedBoardTitle] = useState('');
   const [userId, setUserId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(''); //search query [cite: 13]
+
+  const highlightText = (text) => { //function to highlight the text [cite: 14, 15, 16]
+    if (!searchQuery) return text;
+
+    const regex = new RegExp(`(${searchQuery})`, 'gi');
+    return text.split(regex).map((part, index) =>
+      regex.test(part) ? (
+        <span key={index} className="bg-yellow-200">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -182,7 +198,7 @@ function KanbanBoard() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 min-w-64 bg-blue-600 text-gray-200 p-8"> 
+      <div className="w-64 min-w-64 bg-blue-600 text-gray-200 p-8">
         <h2 className='text-3xl font-bold mb-5'>Boards</h2>
         <ul>
           {boards.map((board) => (
@@ -200,7 +216,7 @@ function KanbanBoard() {
                 </>
               ) : (
                 <>
-                  <span onClick={() => setSelectedBoardId(board.id,board.title)} className="cursor-pointer font-bold">{board.title}</span>
+                  <span onClick={() => setSelectedBoardId(board.id, board.title)} className="cursor-pointer font-bold">{board.title}</span>
                   <div>
                     <button className='text-green-500 mr-2' onClick={() => handleEditBoard(board.id, board.title)}><FaEdit /></button>
                     <button className='text-red-500' onClick={() => handleDeleteBoard(board.id)}><FaTrashAlt /></button>
@@ -224,10 +240,18 @@ function KanbanBoard() {
         {selectedBoardId && (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col overflow-x-auto">
-            <div className="flex bg-blue-200 p-2 justify-start items-left">
-                <h2 className="text-2xl font-bold">{selectedBoardId ? selectedBoardTitle : "select"} Board</h2>
+              <div className="flex bg-blue-200 p-2 justify-start items-left">
+                <h2 className="text-2xl font-bold">{selectedBoardId ?
+                  selectedBoardTitle : "select"} Board</h2>
                 <div className='text-xl pl-5 mr-5'><FaStar /></div>
                 <div className='text-xl pl-5'><FaShare /></div>
+                <input //search bar [cite: 13]
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search tasks..."
+                  className="p-2 border rounded-md bg-white ml-auto absolute top-2 right-12"
+                />
               </div>
               <div className="flex overflow-x-auto">
                 <Droppable droppableId="all-lists" direction="horizontal" type="list">
@@ -268,11 +292,11 @@ function KanbanBoard() {
                                   </>
                                 )}
                               </div>
-                              <Droppable droppableId={list.id} type="card"> 
+                              <Droppable droppableId={list.id} type="card">
                                 {(provided) => (
                                   <div ref={provided.innerRef} {...provided.droppableProps}><br></br>
                                     {cards
-                                      .filter((card) => card.list_id === list.id)
+                                      .filter((card) => card.list_id === list.id && card.title.toLowerCase().includes(searchQuery.toLowerCase())) //filtering cards [cite: 66]
                                       .sort((a, b) => a.position - b.position)
                                       .map((card, index) => (
                                         <Draggable key={card.id} draggableId={card.id} index={index}>
@@ -297,7 +321,7 @@ function KanbanBoard() {
                                                 </>
                                               ) : (
                                                 <>
-                                                  <div className='flex-grow'>{card.title}</div>
+                                                  <div className='flex-grow'>{highlightText(card.title)}</div>  {/*highlighting the text [cite: 78]*/}
                                                   <div>
                                                     <button className='text-green-500 mr-2 flex-end' onClick={() => handleEditCard(card.id, card.title)}><FaEdit /></button>
                                                     <button onClick={() => removeCard(card.id)} className="text-red-500 flex-end"><FaTrashAlt /></button>
