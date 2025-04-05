@@ -1,207 +1,307 @@
-// src/components/KanbanBoard.jsx
-import React, { useEffect, useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import useStore from '../store';
-import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes, FaStar, FaUser, FaShare } from 'react-icons/fa';
-import { supabase } from '../supabaseClient';
-import CardDetailsModal from './CardDetailsModal';
-
-function KanbanBoard() {
-  const boards = useStore((state) => state.boards);
-  const lists = useStore((state) => state.lists);
-  const cards = useStore((state) => state.cards);
-  const fetchBoards = useStore((state) => state.fetchBoards);
-  const fetchLists = useStore((state) => state.fetchLists);
-  const fetchCards = useStore((state) => state.fetchCards);
-  const addBoard = useStore((state) => state.addBoard);
-  const updateBoard = useStore((state) => state.updateBoard);
-  const removeBoard = useStore((state) => state.removeBoard);
-  const addList = useStore((state) => state.addList);
-  const addCard = useStore((state) => state.addCard);
-  const updateCardPosition = useStore((state) => state.updateCardPosition);
-  const updateListPosition = useStore((state) => state.updateListPosition);
-  const removeCard = useStore((state) => state.removeCard);
-  const removeList = useStore((state) => state.removeList);
-  const updateList = useStore((state) => state.updateList);
-  const updateCard = useStore((state) => state.updateCard);
-  const selectedBoardId = useStore((state) => state.selectedBoardId);
-  const selectedBoardTitle = useStore((state) => state.selectedBoardTitle);
-  const setSelectedBoardId = useStore((state) => state.setSelectedBoardId);
-
-  const [newListTitle, setNewListTitle] = useState('');
-  const [newCardTitle, setNewCardTitle] = useState('');
-  const [selectedListId, setSelectedListId] = useState(null);
-  const [editingListId, setEditingListId] = useState(null);
-  const [editedListTitle, setEditedListTitle] = useState('');
-  const [editingCardId, setEditingCardId] = useState(null);
-  const [editedCardTitle, setEditedCardTitle] = useState('');
-  const [selectedCardId, setSelectedCardId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newBoardTitle, setNewBoardTitle] = useState('');
-  const [editingBoardId, setEditingBoardId] = useState(null);
-  const [editedBoardTitle, setEditedBoardTitle] = useState('');
-  const [userId, setUserId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(''); //search query [cite: 13]
-
-  const highlightText = (text) => { //function to highlight the text [cite: 14, 15, 16]
-    if (!searchQuery) return text;
-
-    const regex = new RegExp(`(${searchQuery})`, 'gi');
-    return text.split(regex).map((part, index) =>
-      regex.test(part) ? (
-        <span key={index} className="bg-yellow-200">
-          {part}
-        </span>
-      ) : (
-        part
-      )
-    );
-  };
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user.id);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user.id);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (userId) {
-      fetchBoards(userId);
-    }
-  }, [userId, fetchBoards]);
-
-  useEffect(() => {
-    if (selectedBoardId) {
-      fetchLists(selectedBoardId);
-    }
-  }, [selectedBoardId, fetchLists]);
-
-  useEffect(() => {
-    if (lists.length > 0) {
-      fetchCards(lists.map((list) => list.id));
-    }
-  }, [lists, fetchCards]);
-
-  const handleAddBoard = (e) => {
-    e.preventDefault();
-    addBoard(newBoardTitle, userId);
-    setNewBoardTitle('');
-  };
-
-  const handleAddList = (e) => {
-    e.preventDefault();
-    addList(newListTitle, selectedBoardId, lists.length);
-    setNewListTitle('');
-  };
-
-  const handleAddCard = (e) => {
-    e.preventDefault();
-    if (selectedListId) {
-      const listCards = cards.filter((card) => card.list_id === selectedListId);
-      addCard(newCardTitle, selectedListId, listCards.length);
-      setNewCardTitle('');
-    }
-  };
-
-  const onDragEnd = (result) => {
-    const { destination, source, draggableId, type } = result;
-
-    if (!destination) return;
-
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
-    if (type === 'card') {
-      updateCardPosition(draggableId, destination.droppableId, destination.index);
-    } else if (type === 'list') {
-      const draggedList = lists.find((list) => list.id === draggableId);
-      const otherLists = lists.filter((list) => list.id !== draggableId);
-      const reorderedLists = [
-        ...otherLists.slice(0, destination.index),
-        draggedList,
-        ...otherLists.slice(destination.index),
-      ];
-      reorderedLists.forEach((list, index) => {
-        updateListPosition(list.id, index);
-      });
-    }
-  };
-
-  const handleEditList = (listId, title) => {
-    setEditingListId(listId);
-    setEditedListTitle(title);
-  };
-
-  const handleSaveListEdit = (listId) => {
-    updateList(listId, editedListTitle, selectedBoardId);
-    setEditingListId(null);
-  };
-
-  const handleCancelListEdit = () => {
-    setEditingListId(null);
-  };
-
-  const handleEditCard = (cardId, title) => {
-    setEditingCardId(cardId);
-    setEditedCardTitle(title);
-  };
-
-  const handleSaveCardEdit = (cardId) => {
-    updateCard(cardId, editedCardTitle);
-    setEditingCardId(null);
-  };
-
-  const handleCancelCardEdit = () => {
-    setEditingCardId(null);
-  };
-
-  const handleCardClick = (cardId) => {
-    setSelectedCardId(cardId);
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedCardId(null);
-  };
-
-  const handleEditBoard = (boardId, title) => {
-    setEditingBoardId(boardId);
-    setEditedBoardTitle(title);
-  };
-
-  const handleSaveBoardEdit = (boardId) => {
-    updateBoard(boardId, editedBoardTitle, userId);
-    setEditingBoardId(null);
-  };
-
-  const handleCancelBoardEdit = () => {
-    setEditingBoardId(null);
-  };
-
-  const handleDeleteBoard = async (boardId) => {
-    try {
-      if (!userId) {
-        console.error('User ID not available.');
-        return;
-      }
-      console.log(`Attempting to delete board with ID: ${boardId} for user: ${userId}`);
-      await removeBoard(boardId, userId);
-      console.log('Board deletion initiated.');
-    } catch (err) {
-      console.error('Error deleting board:', err);
-    }
-  };
-
-  return (
+ // src/components/KanbanBoard.jsx
+ import React, { useEffect, useState } from 'react';
+ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+ import useStore from '../store';
+ import { FaPlus, FaTrashAlt, FaEdit, FaSave, FaTimes, FaStar, FaUser, FaShare } from 'react-icons/fa';
+ import { supabase } from '../supabaseClient';
+ import CardDetailsModal from './CardDetailsModal';
+ import useBoardsCRUD from '../hooks/useBoardsCRUD'; // Import the custom hooks
+ import useListsCRUD from '../hooks/useListsCRUD';
+ import useCardsCRUD from '../hooks/useCardsCRUD';
+ 
+ function KanbanBoard() {
+   const boardsFromStore = useStore((state) => state.boards);
+   const listsFromStore = useStore((state) => state.lists);
+   const cardsFromStore = useStore((state) => state.cards);
+   const fetchBoardsFromStore = useStore((state) => state.fetchBoards);
+   const fetchListsFromStore = useStore((state) => state.fetchLists);
+   const fetchCardsFromStore = useStore((state) => state.fetchCards);
+   const addBoardToStore = useStore((state) => state.addBoard);
+   const updateBoardInStore = useStore((state) => state.updateBoard);
+   const removeBoardFromStore = useStore((state) => state.removeBoard);
+   const addListToStore = useStore((state) => state.addList);
+   const addCardToStore = useStore((state) => state.addCard);
+   const updateCardPositionInStore = useStore((state) => state.updateCardPosition);
+   const updateListPositionInStore = useStore((state) => state.updateListPosition);
+   const removeCardFromStore = useStore((state) => state.removeCard);
+   const removeListFromStore = useStore((state) => state.removeList);
+   const updateListInStore = useStore((state) => state.updateList);
+   const updateCardInStore = useStore((state) => state.updateCard);
+   const selectedBoardIdFromStore = useStore((state) => state.selectedBoardId);
+   const selectedBoardTitleFromStore = useStore((state) => state.selectedBoardTitle);
+   const setSelectedBoardIdInStore = useStore((state) => state.setSelectedBoardId);
+ 
+   const [newListTitle, setNewListTitle] = useState('');
+   const [newCardTitle, setNewCardTitle] = useState('');
+   const [selectedListId, setSelectedListId] = useState(null);
+   const [editingListId, setEditingListId] = useState(null);
+   const [editedListTitle, setEditedListTitle] = useState('');
+   const [editingCardId, setEditingCardId] = useState(null);
+   const [editedCardTitle, setEditedCardTitle] = useState('');
+   const [selectedCardId, setSelectedCardId] = useState(null);
+   const [isModalOpen, setIsModalOpen] = useState(false);
+   const [newBoardTitle, setNewBoardTitle] = useState('');
+   const [editingBoardId, setEditingBoardId] = useState(null);
+   const [editedBoardTitle, setEditedBoardTitle] = useState('');
+   const [userId, setUserId] = useState(null);
+   const [searchQuery, setSearchQuery] = useState('');
+ 
+   const {
+     loading: boardsLoading,
+     error: boardsError,
+     createBoard,
+     fetchBoards,
+     updateBoard,
+     deleteBoard,
+   } = useBoardsCRUD();
+   const {
+     loading: listsLoading,
+     error: listsError,
+     createList,
+     fetchLists,
+     updateList,
+     deleteList: deleteListFromDB,
+     updateListPosition,
+   } = useListsCRUD();
+   const {
+     loading: cardsLoading,
+     error: cardsError,
+     createCard,
+     fetchCards,
+     updateCard,
+     deleteCard: deleteCardFromDB,
+     updateCardPosition: updateCardPositionInDB,
+   } = useCardsCRUD();
+ 
+   const highlightText = (text) => {
+     if (!searchQuery) return text;
+ 
+     const regex = new RegExp(`(${searchQuery})`, 'gi');
+     return text.split(regex).map((part, index) =>
+       regex.test(part) ? (
+         <span key={index} className="bg-yellow-200">
+           {part}
+         </span>
+       ) : (
+         part
+       )
+     );
+   };
+ 
+   useEffect(() => {
+     supabase.auth.getSession().then(({ data: { session } }) => {
+       setUserId(session?.user.id);
+     });
+ 
+     supabase.auth.onAuthStateChange((_event, session) => {
+       setUserId(session?.user.id);
+     });
+   }, []);
+ 
+   useEffect(() => {
+     if (userId) {
+       fetchBoards(userId);
+     }
+   }, [userId, fetchBoards]);
+ 
+   useEffect(() => {
+     if (selectedBoardIdFromStore) {
+       fetchLists(selectedBoardIdFromStore);
+     }
+   }, [selectedBoardIdFromStore, fetchLists]);
+ 
+   useEffect(() => {
+     if (listsFromStore.length > 0) {
+       fetchCards(listsFromStore.map((list) => list.id));
+     }
+   }, [listsFromStore, fetchCards]);
+ 
+   const handleAddBoard = async (e) => {
+     e.preventDefault();
+     try {
+       const newBoard = await createBoard(newBoardTitle, userId);
+       if (newBoard) {
+         addBoardToStore(newBoard);
+         setNewBoardTitle('');
+       }
+     } catch (err) {
+       // Handle error (e.g., show a notification)
+     }
+   };
+ 
+   const handleAddList = async (e) => {
+     e.preventDefault();
+     try {
+       const newList = await createList(newListTitle, selectedBoardIdFromStore, listsFromStore.length);
+       if (newList) {
+         addListToStore(newList);
+         setNewListTitle('');
+       }
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleAddCard = async (e) => {
+     e.preventDefault();
+     if (selectedListId) {
+       try {
+         const newCard = await createCard(newCardTitle, selectedListId, cardsFromStore.filter((card) => card.list_id === selectedListId).length);
+         if (newCard) {
+           addCardToStore(newCard);
+           setNewCardTitle('');
+         }
+       } catch (err) {
+         // Handle error
+       }
+     }
+   };
+ 
+   const onDragEnd = (result) => {
+     const { destination, source, draggableId, type } = result;
+ 
+     if (!destination) return;
+ 
+     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+ 
+     if (type === 'card') {
+       updateCardPosition(draggableId, destination.droppableId, destination.index);
+     } else if (type === 'list') {
+       const draggedList = listsFromStore.find((list) => list.id === draggableId);
+       const otherLists = listsFromStore.filter((list) => list.id !== draggableId);
+       const reorderedLists = [
+         ...otherLists.slice(0, destination.index),
+         draggedList,
+         ...otherLists.slice(destination.index),
+       ];
+       reorderedLists.forEach((list, index) => {
+         updateListPosition(list.id, index);
+       });
+     }
+   };
+ 
+   const handleEditList = (listId, title) => {
+     setEditingListId(listId);
+     setEditedListTitle(title);
+   };
+ 
+   const handleSaveListEdit = async (listId) => {
+     try {
+       await updateList(listId, editedListTitle, selectedBoardIdFromStore);
+       updateListInStore(listId, editedListTitle, selectedBoardIdFromStore);
+       setEditingListId(null);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleCancelListEdit = () => {
+     setEditingListId(null);
+   };
+ 
+   const handleEditCard = (cardId, title) => {
+     setEditingCardId(cardId);
+     setEditedCardTitle(title);
+   };
+ 
+   const handleSaveCardEdit = async (cardId) => {
+     try {
+       await updateCard(cardId, editedCardTitle);
+       updateCardInStore(cardId, editedCardTitle);
+       setEditingCardId(null);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleCancelCardEdit = () => {
+     setEditingCardId(null);
+   };
+ 
+   const handleCardClick = (cardId) => {
+     setSelectedCardId(cardId);
+     setIsModalOpen(true);
+   };
+ 
+   const handleModalClose = () => {
+     setIsModalOpen(false);
+     setSelectedCardId(null);
+   };
+ 
+   const handleEditBoard = (boardId, title) => {
+     setEditingBoardId(boardId);
+     setEditedBoardTitle(title);
+   };
+ 
+   const handleSaveBoardEdit = async (boardId) => {
+     try {
+       await updateBoard(boardId, editedBoardTitle, userId);
+       updateBoardInStore(boardId, editedBoardTitle, userId);
+       setEditingBoardId(null);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleCancelBoardEdit = () => {
+     setEditingBoardId(null);
+   };
+ 
+   const handleDeleteBoard = async (boardId) => {
+     try {
+       if (!userId) {
+         console.error('User ID not available.');
+         return;
+       }
+       await deleteBoard(boardId, userId);
+       removeBoardFromStore(boardId);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleDeleteList = async (listId) => {
+     try {
+       await deleteListFromDB(listId);
+       removeListFromStore(listId);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleDeleteCard = async (cardId) => {
+     try {
+       await deleteCardFromDB(cardId);
+       removeCardFromStore(cardId);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleUpdateCardPosition = async (id, list_id, position) => {
+     try {
+       await updateCardPositionInDB(id, list_id, position);
+       updateCardPositionInStore(id, list_id, position);
+     } catch (err) {
+       // Handle error
+     }
+   };
+ 
+   const handleUpdateListPosition = async (id, position) => {
+     try {
+       await updateListPosition(id, position);
+       updateListPositionInStore(id, position);
+     } catch (err) {
+       // Handle error
+     }
+   };
+   
+   return (
     <div className="flex h-screen">
       <div className="w-64 min-w-64 bg-blue-600 text-gray-200 p-8">
         <h2 className='text-3xl font-bold mb-5'>Boards</h2>
         <ul>
-          {boards.map((board) => (
+          {boardsFromStore.map((board) => (
             <li key={board.id} className="flex items-center justify-between mb-3">
               {editingBoardId === board.id ? (
                 <>
@@ -216,7 +316,7 @@ function KanbanBoard() {
                 </>
               ) : (
                 <>
-                  <span onClick={() => setSelectedBoardId(board.id, board.title)} className="cursor-pointer font-bold">{board.title}</span>
+                  <span onClick={() => setSelectedBoardIdInStore(board.id, board.title)} className="cursor-pointer font-bold">{board.title}</span>
                   <div>
                     <button className='text-green-500 mr-2' onClick={() => handleEditBoard(board.id, board.title)}><FaEdit /></button>
                     <button className='text-red-500' onClick={() => handleDeleteBoard(board.id)}><FaTrashAlt /></button>
@@ -237,20 +337,20 @@ function KanbanBoard() {
         </form>
       </div>
       <div className="flex-1 bg-blue-500">
-        {selectedBoardId && (
+        {selectedBoardIdFromStore && (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col overflow-x-auto">
               <div className="flex bg-blue-200 p-2 justify-start items-left">
-                <h2 className="text-2xl font-bold">{selectedBoardId ?
-                  selectedBoardTitle : "select"} Board</h2>
+                <h2 className="text-2xl font-bold">{selectedBoardIdFromStore ?
+                  selectedBoardTitleFromStore : "select"} Board</h2>
                 <div className='text-xl pl-5 mr-5'><FaStar /></div>
                 <div className='text-xl pl-5'><FaShare /></div>
-                <input //search bar [cite: 13]
+                <input //search bar
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search tasks..."
-                  className="p-2 border rounded-md bg-white ml-auto absolute top-2 right-12"
+                  className="p-2 border rounded-md ml-auto"
                 />
               </div>
               <div className="flex overflow-x-auto">
@@ -261,7 +361,7 @@ function KanbanBoard() {
                       ref={provided.innerRef}
                       className="flex flex-nowrap space-x-4"
                     >
-                      {lists.map((list, index) => (
+                      {listsFromStore.map((list, index) => (
                         <Draggable key={list.id} draggableId={list.id} index={index}>
                           {(provided) => (
                             <div
@@ -287,7 +387,7 @@ function KanbanBoard() {
                                     <h3 className="font-semibold mb-2">{list.title}</h3>
                                     <div>
                                       <button className='text-green-500 mr-2' onClick={() => handleEditList(list.id, list.title)}><FaEdit /></button>
-                                      <button onClick={() => removeList(list.id)} className="text-red-500"><FaTrashAlt /></button>
+                                      <button onClick={() => handleDeleteList(list.id)} className="text-red-500"><FaTrashAlt /></button>
                                     </div>
                                   </>
                                 )}
@@ -295,8 +395,8 @@ function KanbanBoard() {
                               <Droppable droppableId={list.id} type="card">
                                 {(provided) => (
                                   <div ref={provided.innerRef} {...provided.droppableProps}><br></br>
-                                    {cards
-                                      .filter((card) => card.list_id === list.id && card.title.toLowerCase().includes(searchQuery.toLowerCase())) //filtering cards [cite: 66]
+                                    {cardsFromStore
+                                      .filter((card) => card.list_id === list.id && card.title.toLowerCase().includes(searchQuery.toLowerCase())) //filtering cards
                                       .sort((a, b) => a.position - b.position)
                                       .map((card, index) => (
                                         <Draggable key={card.id} draggableId={card.id} index={index}>
@@ -321,10 +421,10 @@ function KanbanBoard() {
                                                 </>
                                               ) : (
                                                 <>
-                                                  <div className='flex-grow'>{highlightText(card.title)}</div>  {/*highlighting the text [cite: 78]*/}
+                                                  <div className='flex-grow'>{highlightText(card.title)}</div>  {/*highlighting the text*/}
                                                   <div>
                                                     <button className='text-green-500 mr-2 flex-end' onClick={() => handleEditCard(card.id, card.title)}><FaEdit /></button>
-                                                    <button onClick={() => removeCard(card.id)} className="text-red-500 flex-end"><FaTrashAlt /></button>
+                                                    <button onClick={() => handleDeleteCard(card.id)} className="text-red-500 flex-end"><FaTrashAlt /></button>
                                                   </div>
                                                 </>
                                               )}
