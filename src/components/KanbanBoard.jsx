@@ -396,7 +396,7 @@
                                               ref={provided.innerRef}
                                               {...provided.draggableProps}
                                               {...provided.dragHandleProps}
-                                              onClick={() => handleCardClick(card.id)}
+                                              onContextMenu={() => handleCardClick(card.id)}
                                               className="bg-gray-200 p-3 rounded-md shadow-sm mb-2 hover:shadow-md transition-shadow flex flex-row"
                                             >
                                               {editingCardId === card.id ? (
