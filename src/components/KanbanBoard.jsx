@@ -100,45 +100,39 @@
  
    useEffect(() => {
      if (userId) {
-       fetchBoards(userId);
+       fetchBoardsFromStore(userId);
      }
    }, [userId, fetchBoards]);
  
    useEffect(() => {
      if (selectedBoardIdFromStore) {
-       fetchLists(selectedBoardIdFromStore);
+       fetchListsFromStore(selectedBoardIdFromStore);
      }
    }, [selectedBoardIdFromStore, fetchLists]);
  
    useEffect(() => {
      if (listsFromStore.length > 0) {
-       fetchCards(listsFromStore.map((list) => list.id));
+       fetchCardsFromStore(listsFromStore.map((list) => list.id));
      }
    }, [listsFromStore, fetchCards]);
  
    const handleAddBoard = async (e) => {
      e.preventDefault();
      try {
-       const newBoard = await createBoard(newBoardTitle, userId);
-       if (newBoard) {
-         addBoardToStore(newBoard);
+         addBoardToStore(newBoardTitle, userId);
          setNewBoardTitle('');
-       }
-     } catch (err) {
-       // Handle error (e.g., show a notification)
+     } catch (err) {      
+      console.error('Error deleting card:', err);
      }
    };
  
    const handleAddList = async (e) => {
      e.preventDefault();
      try {
-       const newList = await createList(newListTitle, selectedBoardIdFromStore, listsFromStore.length);
-       if (newList) {
-         addListToStore(newList);
+      addListToStore(newListTitle, selectedBoardIdFromStore, listsFromStore.length);
          setNewListTitle('');
-       }
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -146,13 +140,10 @@
      e.preventDefault();
      if (selectedListId) {
        try {
-         const newCard = await createCard(newCardTitle, selectedListId, cardsFromStore.filter((card) => card.list_id === selectedListId).length);
-         if (newCard) {
-           addCardToStore(newCard);
+           addCardToStore(newCardTitle, selectedListId, cardsFromStore.filter((card) => card.list_id === selectedListId).length);
            setNewCardTitle('');
-         }
        } catch (err) {
-         // Handle error
+        console.error('Error deleting card:', err);
        }
      }
    };
@@ -165,7 +156,7 @@
      if (destination.droppableId === source.droppableId && destination.index === source.index) return;
  
      if (type === 'card') {
-       updateCardPosition(draggableId, destination.droppableId, destination.index);
+       updateCardPositionInStore(draggableId, destination.droppableId, destination.index);
      } else if (type === 'list') {
        const draggedList = listsFromStore.find((list) => list.id === draggableId);
        const otherLists = listsFromStore.filter((list) => list.id !== draggableId);
@@ -191,7 +182,7 @@
        updateListInStore(listId, editedListTitle, selectedBoardIdFromStore);
        setEditingListId(null);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -210,7 +201,7 @@
        updateCardInStore(cardId, editedCardTitle);
        setEditingCardId(null);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -239,7 +230,7 @@
        updateBoardInStore(boardId, editedBoardTitle, userId);
        setEditingBoardId(null);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -256,7 +247,7 @@
        await deleteBoard(boardId, userId);
        removeBoardFromStore(boardId);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -265,7 +256,7 @@
        await deleteListFromDB(listId);
        removeListFromStore(listId);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -274,7 +265,7 @@
        await deleteCardFromDB(cardId);
        removeCardFromStore(cardId);
      } catch (err) {
-       // Handle error
+       console.error('Error deleting card:', err);
      }
    };
  
@@ -283,7 +274,7 @@
        await updateCardPositionInDB(id, list_id, position);
        updateCardPositionInStore(id, list_id, position);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
  
@@ -292,7 +283,7 @@
        await updateListPosition(id, position);
        updateListPositionInStore(id, position);
      } catch (err) {
-       // Handle error
+      console.error('Error deleting card:', err);
      }
    };
    
@@ -350,7 +341,7 @@
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search tasks..."
-                  className="p-2 border rounded-md ml-auto"
+                  className="p-2 border rounded-md ml-auto absolute right-12 top-2 w-1/4 bg-white text-gray-800"
                 />
               </div>
               <div className="flex overflow-x-auto">
