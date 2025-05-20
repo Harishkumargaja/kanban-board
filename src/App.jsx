@@ -142,13 +142,17 @@ function App() {
       <div className="bg-blue-800 text-white p-2 flex flex-row">
         <h3 className="text-2xl font-semibold text-left flex-none align-middle">Harish's Kanban Board</h3>
         <div className='flex-grow'></div>
-        <div onClick={() => handleToggle()} className="items-center flex-end text-2xl cursor-pointer m-2">
+        <button 
+          onClick={() => handleToggle()} 
+          className="items-center flex-end text-2xl cursor-pointer m-2" 
+          aria-label="Toggle user menu"
+        >
           {imagePreviewUrl ? (
-            <img src={imagePreviewUrl} alt="User" className="rounded-full h-8 w-8" />
+            <img src={imagePreviewUrl} alt="User Avatar" className="w-8 h-8 rounded-full" />
           ) : (
             <FaUser className="text-2xl" />
           )}
-        </div>
+        </button>
 
         {isOpen && (
           <div ref={divRef} className='bg-gray-500 absolute text-2xl text-gray-800 right-2 top-16 z-10'>
