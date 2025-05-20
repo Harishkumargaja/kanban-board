@@ -13,7 +13,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false);
   const divRef = useRef(null);
 
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [setSelectedImage] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState('');
 
   const handleClickOutside = (event) => {
