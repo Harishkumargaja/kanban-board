@@ -166,7 +166,13 @@ function App() {
                 style={{ display: 'none' }}
               />
             </label>
-            <div onClick={handleLogout} className='p-2 rounded-md shadow-md cursor-pointer'>Logout</div>
+            <button 
+              onClick={handleLogout} 
+              className='p-2 rounded-md shadow-md cursor-pointer' 
+              aria-label="Logout"
+            >
+              Logout
+            </button>
           </div>
         )}
       </div>
