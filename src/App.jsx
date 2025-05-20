@@ -5,7 +5,6 @@ import KanbanBoard from './components/KanbanBoard';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import useStore from './store';
 import { FaUser } from 'react-icons/fa6';
 
 function App() {
