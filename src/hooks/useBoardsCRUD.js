@@ -1,117 +1,145 @@
 // src/hooks/useBoardsCRUD.js
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import useStore from '../store'; // Import Zustand store [cite: 1, 36]
+import useStore from '../store';
 
-function useBoardsCRUD() {
- const [loading, setLoading] = useState(false);
- const [error, setError] = useState(null);
+const useBoardsCRUD = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
- const { addBoard, fetchBoards: fetchBoardsFromStore, updateBoard: updateBoardInStore, removeBoard: removeBoardFromStore } = useStore(); // Get Zustand actions [cite: 36, 37, 38, 39]
+  const boards = useStore((state) => state.boards);
+  const addBoardToStore = useStore((state) => state.addBoard);
+  const updateBoardInStore = useStore((state) => state.updateBoard);
+  const removeBoardFromStore = useStore((state) => state.removeBoard);
 
- const createBoard = useCallback(async (title, userId) => {
-  setLoading(true);
-  setError(null);
-  try {
-   const { data, error } = await supabase
-     .from('boards')
-     .insert([{ title, user_id: userId }])
-     .select()
-     .single();
-   if (error) {
-    setError(error);
-    return null;
-   }
-   if (data) {
-     addBoard(data); // Update Zustand store [cite: 44, 45]
-   }
-   return data;
-  } catch (err) {
-   setError(err);
-   return null;
-  } finally {
-   setLoading(false);
-  }
- }, [addBoard]); // Dependency on addBoard
+  const createBoard = async (title, userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('boards')
+        .insert([{ title, user_id: userId }])
+        .select();
+      if (error) {
+        throw new Error(error.message);
+      }
+      if (data && data.length > 0) {
+        addBoardToStore(data[0]); // Zustand update
+      }
+      return data;
+    } catch (err) {
+      setError(err);
+      console.error("Error creating board:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const fetchBoards = useCallback(async (userId) => {
-  setLoading(true);
-  setError(null);
-  try {
-   const { data, error } = await supabase
-     .from('boards')
-     .select('*')
-     .eq('user_id', userId);
-   if (error) {
-    setError(error);
-    return [];
-   }
-   if (data) {
-    fetchBoardsFromStore(data); // Update Zustand store [cite: 36, 37]
-   }
-   return data;
-  } catch (err) {
-   setError(err);
-   return [];
-  } finally {
-   setLoading(false);
-  }
- }, [fetchBoardsFromStore]); // Dependency on fetchBoardsFromStore
+  const fetchBoards = async (userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('boards')
+        .select('*') //  Fetch all columns including favorite
+        .eq('user_id', userId);
+      if (error) {
+        throw new Error(error.message);
+      }
+      useStore.setState({ boards: data }); // Zustand update
+      return data;
+    } catch (err) {
+      setError(err);
+      console.error("Error fetching boards:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const updateBoard = useCallback(async (id, title, userId) => {
-  setLoading(true);
-  setError(null);
-  try {
-   const { error } = await supabase
-     .from('boards')
-     .update({ title })
-     .eq('id', id)
-     .eq('user_id', userId);
-   if (error) {
-    setError(error);
-    return false;
-   }
-   updateBoardInStore(id, title, userId); // Update Zustand store [cite: 37]
-   return true;
-  } catch (err) {
-   setError(err);
-   return false;
-  } finally {
-   setLoading(false);
-  }
- }, [updateBoardInStore]); // Dependency on updateBoardInStore
+  const updateBoard = async (id, title, userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('boards')
+        .update({ title })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select();
+      if (error) {
+        throw new Error(error.message);
+      }
+      if (data && data.length > 0) {
+        updateBoardInStore(id, title); // Zustand update
+      }
+      return data;
+    } catch (err) {
+      setError(err);
+      console.error("Error updating board:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const deleteBoard = useCallback(async (id, userId) => {
-  setLoading(true);
-  setError(null);
-  try {
-   const { error } = await supabase
-     .from('boards')
-     .delete()
-     .eq('id', id)
-     .eq('user_id', userId);
-   if (error) {
-    setError(error);
-    return false;
-   }
-   removeBoardFromStore(id, userId); // Update Zustand store [cite: 38, 39]
-   return true;
-  } catch (err) {
-   setError(err);
-   return false;
-  } finally {
-   setLoading(false);
-  }
- }, [removeBoardFromStore]); // Dependency on removeBoardFromStore
+  const deleteBoard = async (id, userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase
+        .from('boards')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+      if (error) {
+        throw new Error(error.message);
+      }
+      removeBoardFromStore(id); // Zustand update
+    } catch (err) {
+      setError(err);
+      console.error("Error deleting board:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- return {
-  loading,
-  error,
-  createBoard,
-  fetchBoards,
-  updateBoard,
-  deleteBoard,
- };
-}
+  // New function to toggle favorite status
+  const toggleFavoriteBoard = async (boardId, userId, isCurrentlyFavorite) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase
+        .from('boards')
+        .update({ favorite: !isCurrentlyFavorite })
+        .eq('id', boardId)
+        .eq('user_id', userId);
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Optimistically update Zustand store
+      const updatedBoards = boards.map(board =>
+        board.id === boardId ? { ...board, favorite: !isCurrentlyFavorite } : board
+      );
+      useStore.setState({ boards: updatedBoards });
+
+    } catch (err) {
+      setError(err);
+      console.error("Error toggling favorite:", err);
+      // Optionally, revert Zustand store changes on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    loading,
+    error,
+    createBoard,
+    fetchBoards,
+    updateBoard,
+    deleteBoard,
+    toggleFavoriteBoard //  Include the new function
+  };
+};
 
 export default useBoardsCRUD;

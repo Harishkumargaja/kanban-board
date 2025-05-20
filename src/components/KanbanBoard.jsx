@@ -122,7 +122,7 @@
          addBoardToStore(newBoardTitle, userId);
          setNewBoardTitle('');
      } catch (err) {      
-      console.error('Error deleting card:', err);
+      console.error('Error deleting board:', err);
      }
    };
  
@@ -132,7 +132,7 @@
       addListToStore(newListTitle, selectedBoardIdFromStore, listsFromStore.length);
          setNewListTitle('');
      } catch (err) {
-      console.error('Error deleting card:', err);
+      console.error('Error deleting List:', err);
      }
    };
  
@@ -288,7 +288,7 @@
    };
    
    return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-x-auto">
       <div className="w-64 min-w-64 bg-blue-600 text-gray-200 p-8">
         <h2 className='text-3xl font-bold mb-5'>Boards</h2>
         <ul>
@@ -344,7 +344,7 @@
                   className="p-2 border rounded-md ml-auto absolute right-12 top-2 w-1/4 bg-white text-gray-800"
                 />
               </div>
-              <div className="flex overflow-x-auto">
+              <div className="flex overflow-x-scroll">
                 <Droppable droppableId="all-lists" direction="horizontal" type="list">
                   {(provided) => (
                     <div
